@@ -15,6 +15,7 @@ interface ImageCarouselProps {
   className?: string;
   overlay?: boolean;
   indicators?: boolean;
+  cinematic?: boolean;
 }
 
 export function ImageCarousel({ 
@@ -23,11 +24,21 @@ export function ImageCarousel({
   interval = 5000,
   className,
   overlay = true,
-  indicators = true
+  indicators = true,
+  cinematic = true
 }: ImageCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
+  const [loaded, setLoaded] = useState<boolean[]>(new Array(images.length).fill(false));
+
+  const handleImageLoad = (index: number) => {
+    setLoaded(prev => {
+      const newLoaded = [...prev];
+      newLoaded[index] = true;
+      return newLoaded;
+    });
+  };
 
   const goToNext = useCallback(() => {
     if (isAnimating) return;
@@ -36,7 +47,7 @@ export function ImageCarousel({
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     
     // Reset animation flag after transition completes
-    setTimeout(() => setIsAnimating(false), 750);
+    setTimeout(() => setIsAnimating(false), 1000);
   }, [images.length, isAnimating]);
 
   const goToPrev = useCallback(() => {
@@ -46,7 +57,7 @@ export function ImageCarousel({
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
     
     // Reset animation flag after transition completes
-    setTimeout(() => setIsAnimating(false), 750);
+    setTimeout(() => setIsAnimating(false), 1000);
   }, [images.length, isAnimating]);
 
   const goToSlide = (index: number) => {
@@ -56,7 +67,7 @@ export function ImageCarousel({
     setCurrentIndex(index);
     
     // Reset animation flag after transition completes
-    setTimeout(() => setIsAnimating(false), 750);
+    setTimeout(() => setIsAnimating(false), 1000);
   };
 
   useEffect(() => {
@@ -79,28 +90,33 @@ export function ImageCarousel({
           <div 
             key={index}
             className={cn(
-              "absolute inset-0 transition-opacity duration-1000 ease-in-out",
+              "absolute inset-0 transition-opacity duration-1500 ease-in-out",
               index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
             )}
           >
             <img 
               src={image.src} 
               alt={image.alt}
-              className="w-full h-full object-cover object-center"
+              onLoad={() => handleImageLoad(index)}
+              className={cn(
+                "w-full h-full object-cover object-center transform",
+                cinematic && index === currentIndex && "animate-cinematic",
+                !loaded[index] && "blur-sm"
+              )}
             />
           </div>
         ))}
         
         {/* Overlay */}
         {overlay && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-20 pointer-events-none"></div>
         )}
       </div>
       
       {/* Navigation Controls */}
       <button
         onClick={goToPrev}
-        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-colors duration-300"
+        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-colors duration-300 hover:scale-110"
         aria-label="Previous image"
       >
         <ChevronLeft size={24} />
@@ -108,7 +124,7 @@ export function ImageCarousel({
       
       <button
         onClick={goToNext}
-        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-colors duration-300"
+        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 bg-black/30 hover:bg-black/50 rounded-full p-2 text-white transition-colors duration-300 hover:scale-110"
         aria-label="Next image"
       >
         <ChevronRight size={24} />
@@ -122,7 +138,7 @@ export function ImageCarousel({
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                "w-2 h-2 rounded-full transition-all duration-300",
+                "w-2 h-2 rounded-full transition-all duration-500",
                 index === currentIndex 
                   ? "bg-white w-8" 
                   : "bg-white/50 hover:bg-white/80"

@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 
@@ -8,6 +8,8 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
   // Handle smooth scrolling for anchor links
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
@@ -26,13 +28,19 @@ export function Layout({ children }: LayoutProps) {
     };
     
     document.addEventListener('click', handleAnchorClick);
+    
+    // Add page load animation
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+    
     return () => document.removeEventListener('click', handleAnchorClick);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-16">
+      <main className={`flex-grow pt-16 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {children}
       </main>
       <Footer />

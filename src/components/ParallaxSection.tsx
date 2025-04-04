@@ -9,6 +9,8 @@ interface ParallaxSectionProps {
   speed?: number;
   overlay?: boolean;
   height?: string;
+  overlayColor?: string;
+  cinematic?: boolean;
 }
 
 export function ParallaxSection({
@@ -17,7 +19,9 @@ export function ParallaxSection({
   bgImage,
   speed = 0.5,
   overlay = true,
-  height = 'h-[50vh]'
+  height = 'h-[50vh]',
+  overlayColor = 'bg-black/40',
+  cinematic = true
 }: ParallaxSectionProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -64,7 +68,10 @@ export function ParallaxSection({
       {/* Background with parallax effect */}
       <div 
         ref={backgroundRef}
-        className="absolute inset-0 w-full h-[120%] -top-[10%] will-change-transform"
+        className={cn(
+          "absolute inset-0 w-full h-[120%] -top-[10%] will-change-transform",
+          cinematic && "animate-cinematic"
+        )}
         style={{
           backgroundImage: bgImage ? `url(${bgImage})` : undefined,
           backgroundSize: 'cover',
@@ -74,7 +81,7 @@ export function ParallaxSection({
       
       {/* Optional overlay */}
       {overlay && (
-        <div className="absolute inset-0 bg-black/40 z-10"></div>
+        <div className={cn("absolute inset-0 z-10", overlayColor)}></div>
       )}
       
       {/* Content */}

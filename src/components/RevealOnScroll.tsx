@@ -9,6 +9,8 @@ interface RevealOnScrollProps {
   direction?: 'up' | 'down' | 'left' | 'right' | 'none';
   delay?: number;
   distance?: number;
+  duration?: number;
+  once?: boolean;
 }
 
 export function RevealOnScroll({
@@ -17,7 +19,9 @@ export function RevealOnScroll({
   threshold = 0.1,
   direction = 'up',
   delay = 0,
-  distance = 50
+  distance = 50,
+  duration = 0.8,
+  once = true
 }: RevealOnScrollProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -28,9 +32,11 @@ export function RevealOnScroll({
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (currentRef) {
+          if (currentRef && once) {
             observer.unobserve(currentRef);
           }
+        } else if (!once) {
+          setIsVisible(false);
         }
       },
       { threshold }
@@ -45,38 +51,39 @@ export function RevealOnScroll({
         observer.unobserve(currentRef);
       }
     };
-  }, [threshold]);
+  }, [threshold, once]);
 
-  const getDirectionStyles = () => {
+  const getTransformValue = () => {
     if (!isVisible) {
       switch (direction) {
         case 'up':
-          return `translate-y-[${distance}px] opacity-0`;
+          return `translateY(${distance}px)`;
         case 'down':
-          return `translate-y-[-${distance}px] opacity-0`;
+          return `translateY(-${distance}px)`;
         case 'left':
-          return `translate-x-[${distance}px] opacity-0`;
+          return `translateX(${distance}px)`;
         case 'right':
-          return `translate-x-[-${distance}px] opacity-0`;
+          return `translateX(-${distance}px)`;
         case 'none':
-          return 'opacity-0';
+          return 'none';
         default:
-          return `translate-y-[${distance}px] opacity-0`;
+          return `translateY(${distance}px)`;
       }
     }
-    return 'translate-y-0 translate-x-0 opacity-100';
+    return 'translate(0, 0)';
   };
 
   const animationStyle = {
-    transform: isVisible ? 'translate(0, 0)' : undefined,
+    transform: isVisible ? 'translate(0, 0)' : getTransformValue(),
     opacity: isVisible ? 1 : 0,
-    transition: `transform 0.8s ease-out ${delay}s, opacity 0.8s ease-out ${delay}s`,
+    transition: `transform ${duration}s cubic-bezier(0.17, 0.55, 0.55, 1) ${delay}s, opacity ${duration}s cubic-bezier(0.17, 0.55, 0.55, 1) ${delay}s`,
+    willChange: 'transform, opacity'
   };
 
   return (
     <div
       ref={ref}
-      className={cn(className)}
+      className={cn("overflow-hidden", className)}
       style={animationStyle}
     >
       {children}
