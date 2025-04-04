@@ -51,7 +51,9 @@ export function Navbar() {
         ? theme === 'dark'
           ? 'bg-gray-900/95 backdrop-blur-md shadow-md py-2' 
           : 'bg-background/95 backdrop-blur-md shadow-md py-2'
-        : 'bg-transparent py-4'
+        : theme === 'dark' 
+          ? 'bg-transparent py-4' 
+          : 'bg-transparent py-4'
     )}>
       <div className="container-custom flex items-center justify-between">
         {/* Logo */}
@@ -62,7 +64,9 @@ export function Navbar() {
               ? theme === "dark" 
                 ? "text-white" 
                 : "text-foreground" 
-              : "text-white"
+              : theme === "dark"
+                ? "text-white"
+                : "text-foreground"
           )}>
             <span className="inline-block transform transition-transform duration-500 group-hover:scale-110">A</span>
             <span className="inline-block transform transition-transform duration-500 delay-100">L</span>
@@ -87,8 +91,14 @@ export function Navbar() {
                   ? theme === "dark" 
                     ? "text-white/90 hover:text-white" 
                     : "text-foreground hover:text-foreground/80" 
-                  : "text-white hover:text-white/90",
-                location.pathname === item.href ? "text-blue !font-semibold" : ""
+                  : theme === "dark"
+                    ? "text-white/90 hover:text-white"
+                    : "text-foreground hover:text-foreground/80",
+                location.pathname === item.href 
+                  ? theme === "dark" 
+                    ? "text-blue !font-semibold" 
+                    : "text-blue-dark !font-semibold" 
+                  : ""
               )}
             >
               <span>{item.label}</span>
@@ -110,7 +120,9 @@ export function Navbar() {
                 ? theme === "dark" 
                   ? "text-white" 
                   : "text-foreground" 
-                : "text-white"
+                : theme === "dark"
+                  ? "text-white"
+                  : "text-foreground"
             )}
             onClick={toggleMenu}
             aria-label="Toggle menu"
@@ -122,12 +134,18 @@ export function Navbar() {
         {/* Mobile Menu */}
         <div 
           className={cn(
-            "fixed inset-0 bg-blue-dark/95 backdrop-blur-lg flex flex-col items-center justify-center z-50 transition-all duration-500",
+            "fixed inset-0 backdrop-blur-lg flex flex-col items-center justify-center z-50 transition-all duration-500",
+            theme === "dark" 
+              ? "bg-blue-dark/95" 
+              : "bg-white/95",
             isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           )}
         >
           <button 
-            className="absolute top-4 right-4 text-white"
+            className={cn(
+              "absolute top-4 right-4",
+              theme === "dark" ? "text-white" : "text-gray-800"
+            )}
             onClick={toggleMenu}
             aria-label="Close menu"
           >
@@ -139,9 +157,14 @@ export function Navbar() {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "text-xl font-playfair text-white hover:text-blue transition-all duration-300 transform",
+                  "text-xl font-playfair transition-all duration-300 transform",
                   isOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                  location.pathname === item.href ? "text-blue" : "",
+                  theme === "dark" 
+                    ? "text-white hover:text-blue" 
+                    : "text-gray-800 hover:text-blue-dark",
+                  location.pathname === item.href 
+                    ? theme === "dark" ? "text-blue" : "text-blue-dark"
+                    : "",
                 )}
                 style={{ transitionDelay: `${index * 100}ms` }}
                 onClick={toggleMenu}

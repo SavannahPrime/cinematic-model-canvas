@@ -12,7 +12,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={cn(
         "p-2 rounded-full transition-colors duration-300",
         theme === "dark" 
-          ? "bg-white/15 text-white hover:bg-white/25" 
+          ? "bg-white/20 text-white hover:bg-white/30" 
           : "bg-gray-100 text-gray-800 hover:bg-gray-200",
         className
       )}
