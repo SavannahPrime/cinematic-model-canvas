@@ -49,6 +49,7 @@ export function ImageCarousel({
             resolve();
           };
           img.onerror = () => {
+            console.error(`Error loading image: ${image.src}`);
             // Still mark as loaded to avoid infinite loading state
             setLoaded(prev => {
               const newLoaded = [...prev];
@@ -122,6 +123,12 @@ export function ImageCarousel({
     };
   }, [autoplay, interval, goToNext, imagesPreloaded]);
 
+  // Safe fallback for broken images
+  const handleImageError = (index: number) => {
+    console.error(`Failed to load image at index ${index}`);
+    // You could set a placeholder or fallback image here
+  };
+
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
       {/* Loading indicator */}
@@ -146,6 +153,7 @@ export function ImageCarousel({
               alt={image.alt}
               loading={index === 0 ? "eager" : "lazy"}
               onLoad={() => handleImageLoad(index)}
+              onError={() => handleImageError(index)}
               className={cn(
                 "w-full h-full object-cover object-center transform",
                 cinematic && index === currentIndex && "animate-cinematic",

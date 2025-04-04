@@ -48,7 +48,9 @@ export function Navbar() {
     <header className={cn(
       'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
       scrolled 
-        ? 'bg-background/80 backdrop-blur-md shadow-md py-2 dark:bg-gray-900/80' 
+        ? theme === 'dark'
+          ? 'bg-gray-900/95 backdrop-blur-md shadow-md py-2' 
+          : 'bg-background/95 backdrop-blur-md shadow-md py-2'
         : 'bg-transparent py-4'
     )}>
       <div className="container-custom flex items-center justify-between">
@@ -56,7 +58,11 @@ export function Navbar() {
         <Link to="/" className="flex items-center group">
           <span className={cn(
             "text-xl md:text-2xl font-playfair font-bold tracking-tight transition-all duration-500",
-            scrolled ? "text-foreground dark:text-white" : "text-white"
+            scrolled 
+              ? theme === "dark" 
+                ? "text-white" 
+                : "text-foreground" 
+              : "text-white"
           )}>
             <span className="inline-block transform transition-transform duration-500 group-hover:scale-110">A</span>
             <span className="inline-block transform transition-transform duration-500 delay-100">L</span>
@@ -77,8 +83,12 @@ export function Navbar() {
               to={item.href}
               className={cn(
                 "subheading relative overflow-hidden group",
-                scrolled ? "text-foreground dark:text-white" : "text-white",
-                location.pathname === item.href ? "text-blue" : ""
+                scrolled 
+                  ? theme === "dark" 
+                    ? "text-white/90 hover:text-white" 
+                    : "text-foreground hover:text-foreground/80" 
+                  : "text-white hover:text-white/90",
+                location.pathname === item.href ? "text-blue !font-semibold" : ""
               )}
             >
               <span>{item.label}</span>
@@ -96,7 +106,11 @@ export function Navbar() {
           <button 
             className={cn(
               "focus:outline-none transition-colors duration-300",
-              scrolled ? "text-foreground dark:text-white" : "text-white"
+              scrolled 
+                ? theme === "dark" 
+                  ? "text-white" 
+                  : "text-foreground" 
+                : "text-white"
             )}
             onClick={toggleMenu}
             aria-label="Toggle menu"

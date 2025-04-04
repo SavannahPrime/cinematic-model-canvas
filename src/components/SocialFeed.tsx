@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Instagram, ExternalLink } from 'lucide-react';
 import { RevealOnScroll } from './RevealOnScroll';
+import { useTheme } from '@/context/ThemeContext';
 
 // Mock social media posts
 const mockPosts = [
@@ -50,6 +51,8 @@ interface SocialPost {
 
 export function SocialFeed() {
   const [posts, setPosts] = useState<SocialPost[]>(mockPosts);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const { theme } = useTheme();
   
   // Simulate refreshing posts every 30 seconds
   useEffect(() => {
@@ -62,8 +65,16 @@ export function SocialFeed() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleImageError = (postId: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [postId]: true
+    }));
+    console.error(`Failed to load image for post: ${postId}`);
+  };
+
   return (
-    <section className="py-20 bg-white">
+    <section className={`py-20 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white'}`}>
       <div className="container-custom">
         <RevealOnScroll>
           <div className="flex items-center justify-center gap-2 mb-2">
@@ -81,9 +92,11 @@ export function SocialFeed() {
               className="group relative overflow-hidden rounded-lg aspect-square"
             >
               <img 
-                src={post.imageUrl} 
+                src={imageErrors[post.id] ? 'https://images.unsplash.com/photo-1614289371518-722f2615943d' : post.imageUrl} 
                 alt={`Instagram post ${post.id}`}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={() => handleImageError(post.id)}
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                 <p className="text-white text-sm line-clamp-2 mb-2">{post.caption}</p>
@@ -102,7 +115,7 @@ export function SocialFeed() {
               >
                 <span className="sr-only">View on Instagram</span>
               </a>
-              <ExternalLink size={16} className="absolute top-2 right-2 text-white bg-black/30 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ExternalLink size={16} className="absolute top-2 right-2 text-white bg-black/50 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </RevealOnScroll>
           ))}
         </div>
