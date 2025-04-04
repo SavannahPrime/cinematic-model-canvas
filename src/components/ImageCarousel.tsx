@@ -31,6 +31,46 @@ export function ImageCarousel({
   const [isAnimating, setIsAnimating] = useState(false);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
   const [loaded, setLoaded] = useState<boolean[]>(new Array(images.length).fill(false));
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
+
+  // Preload images for smoother experience
+  useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = images.map((image, index) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.src = image.src;
+          img.onload = () => {
+            setLoaded(prev => {
+              const newLoaded = [...prev];
+              newLoaded[index] = true;
+              return newLoaded;
+            });
+            resolve();
+          };
+          img.onerror = () => {
+            // Still mark as loaded to avoid infinite loading state
+            setLoaded(prev => {
+              const newLoaded = [...prev];
+              newLoaded[index] = true;
+              return newLoaded;
+            });
+            resolve();
+          };
+        });
+      });
+      
+      // Wait for first image to load before showing carousel
+      await imagePromises[0];
+      
+      // Preload the rest in background
+      Promise.all(imagePromises).then(() => {
+        setImagesPreloaded(true);
+      });
+    };
+    
+    preloadImages();
+  }, [images]);
 
   const handleImageLoad = (index: number) => {
     setLoaded(prev => {
@@ -71,7 +111,7 @@ export function ImageCarousel({
   };
 
   useEffect(() => {
-    if (autoplay) {
+    if (autoplay && imagesPreloaded) {
       autoplayRef.current = setInterval(goToNext, interval);
     }
     
@@ -80,10 +120,17 @@ export function ImageCarousel({
         clearInterval(autoplayRef.current);
       }
     };
-  }, [autoplay, interval, goToNext]);
+  }, [autoplay, interval, goToNext, imagesPreloaded]);
 
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
+      {/* Loading indicator */}
+      {!loaded[currentIndex] && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 z-20">
+          <div className="w-12 h-12 border-4 border-blue border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      
       {/* Images */}
       <div className="absolute inset-0">
         {images.map((image, index) => (
@@ -97,6 +144,7 @@ export function ImageCarousel({
             <img 
               src={image.src} 
               alt={image.alt}
+              loading={index === 0 ? "eager" : "lazy"}
               onLoad={() => handleImageLoad(index)}
               className={cn(
                 "w-full h-full object-cover object-center transform",

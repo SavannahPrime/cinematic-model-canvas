@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -38,12 +39,14 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className={`flex-grow pt-16 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
-        {children}
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen flex flex-col dark:bg-gray-900 transition-colors duration-300">
+        <Navbar />
+        <main className={`flex-grow pt-16 transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+          {children}
+        </main>
+        <Footer />
+      </div>
+    </ThemeProvider>
   );
 }

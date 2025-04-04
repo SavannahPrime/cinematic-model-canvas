@@ -4,7 +4,7 @@ import { Instagram, Facebook, Twitter, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white pt-16 pb-8">
+    <footer className="bg-black text-white pt-16 pb-8 dark:bg-gray-950">
       <div className="container-custom">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="space-y-4">
@@ -42,13 +42,13 @@ export function Footer() {
             <p className="text-gray-400">For bookings and inquiries:</p>
             <a href="mailto:bookings@alistair.com" className="text-accent">bookings@alistair.com</a>
             <p className="text-gray-400 mt-2">Represented by:</p>
-            <p className="font-medium">Elite Model Management</p>
+            <p className="font-medium">Savannah Prime Agency</p>
           </div>
         </div>
         
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">© {new Date().getFullYear()} Alistair. All rights reserved.</p>
+            <p className="text-gray-500 text-sm">© {new Date().getFullYear()} Alistair. A premium talent from Savannah Prime Agency.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link to="/privacy" className="text-gray-500 text-sm hover:text-white">Privacy Policy</Link>
               <Link to="/terms" className="text-gray-500 text-sm hover:text-white">Terms of Service</Link>

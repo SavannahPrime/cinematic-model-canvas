@@ -59,6 +59,14 @@ export function ParallaxSection({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [speed]);
+  
+  // Create an image preloader for smoother parallax backgrounds
+  useEffect(() => {
+    if (bgImage) {
+      const img = new Image();
+      img.src = bgImage;
+    }
+  }, [bgImage]);
 
   return (
     <div 
@@ -69,7 +77,7 @@ export function ParallaxSection({
       <div 
         ref={backgroundRef}
         className={cn(
-          "absolute inset-0 w-full h-[120%] -top-[10%] will-change-transform",
+          "absolute inset-0 w-full h-[120%] -top-[10%] will-change-transform bg-center bg-cover",
           cinematic && "animate-cinematic"
         )}
         style={{

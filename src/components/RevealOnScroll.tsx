@@ -24,22 +24,30 @@ export function RevealOnScroll({
   once = true
 }: RevealOnScrollProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isIntersecting, setIsIntersecting] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const currentRef = ref.current;
+    
+    // Use Intersection Observer for better performance
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        setIsIntersecting(entry.isIntersecting);
+        if (entry.isIntersecting && once) {
           setIsVisible(true);
-          if (currentRef && once) {
+          if (currentRef) {
             observer.unobserve(currentRef);
           }
         } else if (!once) {
-          setIsVisible(false);
+          setIsVisible(entry.isIntersecting);
         }
       },
-      { threshold }
+      { 
+        threshold,
+        // Add rootMargin to trigger animation slightly before element enters viewport
+        rootMargin: '10px'
+      }
     );
 
     if (currentRef) {
@@ -52,6 +60,15 @@ export function RevealOnScroll({
       }
     };
   }, [threshold, once]);
+
+  // Use requestAnimationFrame for smoother animations
+  useEffect(() => {
+    if (isIntersecting && !isVisible && once) {
+      requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
+    }
+  }, [isIntersecting, isVisible, once]);
 
   const getTransformValue = () => {
     if (!isVisible) {
@@ -74,7 +91,7 @@ export function RevealOnScroll({
   };
 
   const animationStyle = {
-    transform: isVisible ? 'translate(0, 0)' : getTransformValue(),
+    transform: getTransformValue(),
     opacity: isVisible ? 1 : 0,
     transition: `transform ${duration}s cubic-bezier(0.17, 0.55, 0.55, 1) ${delay}s, opacity ${duration}s cubic-bezier(0.17, 0.55, 0.55, 1) ${delay}s`,
     willChange: 'transform, opacity'
